@@ -1,9 +1,14 @@
 function goToPage(pageNumber) {
-	document.getElementById(`page-${pageNumber}`).scrollIntoView({
-		behavior: "smooth",
-		block: "center",
-		inline: "center",
-	});
+	try {
+		document.getElementById(`page-${pageNumber}`).scrollIntoView({
+			behavior: "smooth",
+			block: "center",
+			inline: "center",
+		});
+	// TypeError
+	} catch (error) {
+		return;
+	}
 }
 
 function handlePageChange() {
@@ -23,16 +28,15 @@ function handlePageChange() {
 
 	window.addEventListener('touchstart', function (e) {
 		var touchobj = e.changedTouches[0];
-		swipedir = 'none'
-		startX = touchobj.pageX
-		startY = touchobj.pageY
-		startTime = new Date().getTime() // record time when finger first makes contact with surface
-		e.preventDefault()
-	}, { passive: false });
+		swipedir = 'none';
+		startX = touchobj.pageX;
+		startY = touchobj.pageY;
+		startTime = new Date().getTime();
+	});
 
 	window.addEventListener('touchmove', function (e) {
-		e.preventDefault() // prevent scrolling when inside DIV
-	}, { passive: false });
+		e.preventDefault();
+	});
 
 	window.addEventListener('touchend', function (e) {
 		var touchobj = e.changedTouches[0]
@@ -47,13 +51,11 @@ function handlePageChange() {
 				swipedir = (distY < 0) ? 'up' : 'down';
 			}
 		}
-		e.preventDefault();
-
+		
 		if (swipedir === 'up') { pageNumber += 1; }
 		if (swipedir === 'down') { pageNumber -= 1; }
 		goToPage(pageNumber);
-		
-	}, { passive: false });
+	});
 
 	function _handleWheel(event) {
 		event.preventDefault();
@@ -64,7 +66,8 @@ function handlePageChange() {
 			pageNumber -= 1;
 		}
 
-		try { // TypeError
+		// TypeError
+		try {
 			goToPage(pageNumber);
 		} catch (error) {
 			return;
@@ -72,7 +75,6 @@ function handlePageChange() {
 	}
 
 	function _handleKey(event) {
-		event.preventDefault();
 
 		if (event.keyCode == 33) {
 			pageNumber -= 1
@@ -86,17 +88,15 @@ function handlePageChange() {
 		if (event.keyCode == 36) {
 			pageNumber -= 1;
 		}
-		try { // TypeError
-			sectionNumber = 0;
+		// TypeError
+		try {
 			goToPage(pageNumber);
 		} catch (error) {
 			return;
 		}
 	}
 
-	function _handleTouch(event) {
-		console.log(pageNumber);
-
+	function _handleTouch() {
 		if (touchendY < touchstartY) {
 			pageNumber -= 1;
 		}
@@ -118,5 +118,5 @@ function handlePageChange() {
 
 let handlers = handlePageChange();
 window.addEventListener('wheel', handlers.wheelHandler, { passive: false });
-window.addEventListener('keydown', handlers.keyHandler, { passive: false });
-window.addEventListener('touchend', handlers.touchHandler, { passive: false });
+window.addEventListener('keydown', handlers.keyHandler); //  ,{ passive: false }
+window.addEventListener('touchend', handlers.touchHandler); // , { passive: false }
