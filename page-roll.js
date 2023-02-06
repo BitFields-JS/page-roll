@@ -5,7 +5,7 @@ function goToPage(pageNumber) {
 			block: "center",
 			inline: "center",
 		});
-	// TypeError
+		// TypeError
 	} catch (error) {
 		return;
 	}
@@ -51,7 +51,7 @@ function handlePageChange() {
 				swipedir = (distY < 0) ? 'up' : 'down';
 			}
 		}
-		
+
 		if (swipedir === 'up') { pageNumber += 1; }
 		if (swipedir === 'down') { pageNumber -= 1; }
 		goToPage(pageNumber);
@@ -100,7 +100,7 @@ function handlePageChange() {
 		if (touchendY < touchstartY) {
 			pageNumber -= 1;
 		}
-		
+
 		if (touchendY < touchstartY) {
 			pageNumber += 1;
 		}
