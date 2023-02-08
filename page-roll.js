@@ -1,122 +1,93 @@
-function goToPage(pageNumber) {
-	try {
-		document.getElementById(`page-${pageNumber}`).scrollIntoView({
-			behavior: "smooth",
-			block: "center",
-			inline: "center",
+class PageRoll extends HTMLElement{
+	constructor() {
+		super();
+		this.currentPageIndex = 0;
+		this.allow = this.getAttribute('allow');
+		this.behavior = this.getAttribute('behavior') || 'smooth';
+		this.block = this.getAttribute('block') || 'center';
+		this.inline = this.getAttribute('inline') || 'center';
+
+		window.addEventListener('wheel', this.handleWheel.bind(this), { passive: false });
+		window.addEventListener('keydown', this.handleKey.bind(this)); //  ,{ passive: false }
+	}
+
+	numberOfPages() {
+		return document.getElementsByClassName('page').length;
+	}
+
+	goToPage() {
+		if (this.allow == 'down') {
+			if (this.currentPageIndex < 0 || this.currentPageIndex > this.numberOfPages()) {
+				this.currentPageIndex = 0;
+			}
+		}
+		if (this.allow == 'up-down') {
+			if (this.currentPageIndex > this.numberOfPages()) {
+				this.currentPageIndex = 0;
+			}
+			if (this.currentPageIndex < 0) {
+				this.currentPageIndex = this.numberOfPages() + this.currentPageIndex;
+			}
+		}
+
+		document.getElementById(`page-${this.currentPageIndex}`).scrollIntoView({
+			behavior: this.behavior,
+			block: this.block,
+			inline: this.inline,
 		});
-		// TypeError
-	} catch (error) {
-		return;
 	}
-}
 
-function handlePageChange() {
-	let pageNumber = 0;
-	let touchstartY = 0;
-	let touchendY = 0;
-	let swipedir;
-	let startX;
-	let startY;
-	let distX;
-	let distY;
-	let threshold = 150;
-	let restraint = 100;
-	let allowedTime = 300;
-	let elapsedTime;
-	let startTime;
-
-	window.addEventListener('touchstart', function (e) {
-		var touchobj = e.changedTouches[0];
-		swipedir = 'none';
-		startX = touchobj.pageX;
-		startY = touchobj.pageY;
-		startTime = new Date().getTime();
-	});
-
-	window.addEventListener('touchmove', function (e) {
-		e.preventDefault();
-	});
-
-	window.addEventListener('touchend', function (e) {
-		var touchobj = e.changedTouches[0]
-		distX = touchobj.pageX - startX;
-		distY = touchobj.pageY - startY;
-		elapsedTime = new Date().getTime() - startTime;
-		if (elapsedTime <= allowedTime) {
-			if (Math.abs(distX) >= threshold && Math.abs(distY) <= restraint) {
-				swipedir = (distX < 0) ? 'left' : 'right';
-			}
-			else if (Math.abs(distY) >= threshold && Math.abs(distX) <= restraint) {
-				swipedir = (distY < 0) ? 'up' : 'down';
-			}
-		}
-
-		if (swipedir === 'up') { pageNumber += 1; }
-		if (swipedir === 'down') { pageNumber -= 1; }
-		goToPage(pageNumber);
-	});
-
-	function _handleWheel(event) {
+	handleWheel(event) {
 		event.preventDefault();
-
 		if (event.deltaY > 0) {
-			pageNumber += 1;
+			this.currentPageIndex += 1;
 		} else {
-			pageNumber -= 1;
+			this.currentPageIndex -= 1;
 		}
 
-		// TypeError
-		try {
-			goToPage(pageNumber);
-		} catch (error) {
-			return;
-		}
+		this.goToPage(this.currentPageIndex);
 	}
 
-	function _handleKey(event) {
-
+	handleKey(event) {
 		if (event.keyCode == 33) {
-			pageNumber -= 1
+			this.currentPageIndex -= 1
 		}
 		if (event.keyCode == 34) {
-			pageNumber += 1;
+			this.currentPageIndex += 1;
 		}
 		if (event.keyCode == 35) {
-			pageNumber += 1;
+			this.currentPageIndex += 1;
 		}
 		if (event.keyCode == 36) {
-			pageNumber -= 1;
+			this.currentPageIndex -= 1;
 		}
-		// TypeError
-		try {
-			goToPage(pageNumber);
-		} catch (error) {
-			return;
-		}
+
+		this.goToPage(this.currentPageIndex);
+
 	}
 
-	function _handleTouch() {
-		if (touchendY < touchstartY) {
-			pageNumber -= 1;
-		}
+	handleTouch() {
+		// if (touchendY < touchstartY) {
+		// 	pageNumber -= 1;
+		// }
 
-		if (touchendY < touchstartY) {
-			pageNumber += 1;
-		}
+		// if (touchendY < touchstartY) {
+		// 	pageNumber += 1;
+		// }
 
-		if (pageNumber < 0) {
-			pageNumber = 0;
-		}
+		// if (pageNumber < 0) {
+		// 	pageNumber = 0;
+		// }
 
-		goToPage(pageNumber);
+		// goToPage(pageNumber);
 	}
-
-	return { wheelHandler: _handleWheel, keyHandler: _handleKey, touchHandler: _handleTouch };
 }
 
+(function init() {
+// 	// const pageRoll = new PageRoll();
+// 	window.addEventListener('wheel', pageRoll.handleWheel.bind(pageRoll), { passive: false });
+// 	window.addEventListener('keydown', pageRoll.handleKey.bind(pageRoll)); //  ,{ passive: false }
+// 	// window.addEventListener('touchend', handlers.touchHandler); // , { passive: false }
+	window.customElements.define('page-roll', PageRoll);
+})();
 
-let handlers = handlePageChange();
-window.addEventListener('wheel', handlers.wheelHandler, { passive: false });
-window.addEventListener('keydown', handlers.keyHandler); //  ,{ passive: false }
-window.addEventListener('touchend', handlers.touchHandler); // , { passive: false }
