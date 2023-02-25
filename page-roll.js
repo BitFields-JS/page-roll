@@ -1,6 +1,7 @@
-class PageRoll extends HTMLElement{
+class RollPageContainer extends HTMLElement{
 	constructor() {
 		super();
+		this.setAttribute('class', 'roll-page-container');
 		this.currentPageIndex = 0;
 		this.allow = this.getAttribute('allow');
 		this.behavior = this.getAttribute('behavior') || 'smooth';
@@ -12,7 +13,7 @@ class PageRoll extends HTMLElement{
 	}
 
 	numberOfPages() {
-		return document.getElementsByClassName('page').length;
+		return this.getElementsByTagName('roll-page').length;
 	}
 
 	goToPage() {
@@ -30,7 +31,7 @@ class PageRoll extends HTMLElement{
 			}
 		}
 
-		document.getElementById(`page-${this.currentPageIndex}`).scrollIntoView({
+		this.getElementsByTagName('roll-page')[this.currentPageIndex].scrollIntoView({
 			behavior: this.behavior,
 			block: this.block,
 			inline: this.inline,
@@ -83,11 +84,23 @@ class PageRoll extends HTMLElement{
 	}
 }
 
+
+class RollPage extends HTMLElement {
+	constructor() {
+		super();
+		this.style.display = 'block';
+		this.style.width = '100vw';
+		this.style.height = '100vh';
+	}
+}
+
+
 (function init() {
-// 	// const pageRoll = new PageRoll();
-// 	window.addEventListener('wheel', pageRoll.handleWheel.bind(pageRoll), { passive: false });
-// 	window.addEventListener('keydown', pageRoll.handleKey.bind(pageRoll)); //  ,{ passive: false }
+// 	// const RollPageContainer = new RollPageContainer();
+// 	window.addEventListener('wheel', RollPageContainer.handleWheel.bind(RollPageContainer), { passive: false });
+// 	window.addEventListener('keydown', RollPageContainer.handleKey.bind(RollPageContainer)); //  ,{ passive: false }
 // 	// window.addEventListener('touchend', handlers.touchHandler); // , { passive: false }
-	window.customElements.define('page-roll', PageRoll);
+	window.customElements.define('roll-container', RollPageContainer);
+	window.customElements.define('roll-page', RollPage);
 })();
 
